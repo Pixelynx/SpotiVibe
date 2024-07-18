@@ -1,1 +1,15 @@
+# Spotify cache
+.cache
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local config
+SpPy.txt
+
+# Environment variables
+.env 
+
+# Virtual environment
 venv/

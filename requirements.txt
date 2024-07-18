@@ -2,3 +2,5 @@ nltk=2.24.0
 pandas=2.2.2
 requests=2.32.3
 spotipy=3.8.1
+Flask==3.0.3
+python-dotenv=1.0.1
