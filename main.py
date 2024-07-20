@@ -1,16 +1,19 @@
-import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from spotify_api import get_spotify_client, get_artist_id, get_artist_tracks, get_spotify_oauth
+import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 def calculate_total_duration(tracks):
     total_duration_ms = sum(track['duration_ms'] for track in tracks)
-    return total_duration_ms / (1000 * 60 * 60)  # Convert to hours
+    total_seconds = total_duration_ms // 1000
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return hours, minutes, seconds
 
 @app.route('/')
 def index():
@@ -31,11 +34,41 @@ def search():
         return f"Artist {artist_name} not found.", 404
 
     tracks = get_artist_tracks(sp, artist_id)
-    total_duration_hours = calculate_total_duration(tracks)
     
-    return render_template('results.html', 
-                           artist_name=artist_name, 
-                           total_duration=total_duration_hours)
+    # Prepare data for the template
+    artists = set()
+    song_dict = {}
+    
+    for track in tracks:
+        main_artist = track['artists'][0]['name']
+        if main_artist not in song_dict:
+            song_dict[main_artist] = []
+        song_dict[main_artist].append(track['name'])
+        artists.add(main_artist)
+    
+    artists = sorted(list(artists))
+    max_songs = max(len(songs) for songs in song_dict.values())
+    
+    song_table = []
+    for i in range(max_songs):
+        row = []
+        for artist in artists:
+            if i < len(song_dict.get(artist, [])):
+                row.append(song_dict[artist][i])
+            else:
+                row.append('')
+        song_table.append(row)
+    
+    hours, minutes, seconds = calculate_total_duration(tracks)
+    
+    return render_template('releasedMusicTime.html', 
+                           artist_name=artist_name,
+                           artists=artists,
+                           song_table=song_table,
+                           hours=hours,
+                           minutes=minutes,
+                           seconds=seconds)
+
 
 @app.route('/login')
 def login():
@@ -50,7 +83,7 @@ def callback():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     session["token_info"] = token_info
-    return redirect('/search')
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
