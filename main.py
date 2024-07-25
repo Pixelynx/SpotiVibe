@@ -36,38 +36,52 @@ def search():
     tracks = get_artist_tracks(sp, artist_id)
     
     # Prepare data for the template
-    artists = set()
+    main_artists = set()
     song_dict = {}
+    # featured_artists = {}
     
     for track in tracks:
-        main_artist = track['artists'][0]['name']
+        main_artist = track['artists'][0]['name']  # Assume first artist is main artist
+        song_name = track['name']
+        
         if main_artist not in song_dict:
-            song_dict[main_artist] = []
-        song_dict[main_artist].append(track['name'])
-        artists.add(main_artist)
+            song_dict[main_artist] = set()
+            main_artists.add(main_artist)
+        
+        song_dict[main_artist].add(song_name)
+        
+        # Keep track of featured artists
+        # if len(track['artists']) > 1:
+        #     featured_artists[song_name] = [artist['name'] for artist in track['artists'][1:]]
     
-    artists = sorted(list(artists))
+    # Convert sets to sorted lists for consistent display
+    for artist in song_dict:
+        song_dict[artist] = sorted(list(song_dict[artist]))
+
+    main_artists = sorted(list(main_artists))
     max_songs = max(len(songs) for songs in song_dict.values())
     
     song_table = []
     for i in range(max_songs):
         row = []
-        for artist in artists:
+        for artist in main_artists:
             if i < len(song_dict.get(artist, [])):
                 row.append(song_dict[artist][i])
             else:
                 row.append('')
         song_table.append(row)
-    
+
     hours, minutes, seconds = calculate_total_duration(tracks)
     
     return render_template('releasedMusicTime.html', 
                            artist_name=artist_name,
-                           artists=artists,
+                           artists=main_artists,
                            song_table=song_table,
                            hours=hours,
                            minutes=minutes,
                            seconds=seconds)
+                        #    featured_artists=featured_artists)  # Pass this to template if needed
+
 
 
 @app.route('/login')
