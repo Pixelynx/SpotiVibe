@@ -29,9 +29,15 @@ def get_lyrics_and_info(song_title, artist_name):
             page = requests.get(song_url)
             page.raise_for_status()
             html = BeautifulSoup(page.text, "html.parser")
-            lyrics = html.find("div", class_="lyrics").get_text()
+            lyrics_div = html.find("div", class_="lyrics")
+            if lyrics_div:
+                lyrics = lyrics_div.get_text()
+            else:
+                lyrics = html.find("div", class_="Lyrics__Container").get_text()
             release_date = remote_song_info["result"].get("release_date_for_display", "Unknown")
             return lyrics, song_url, release_date
     except requests.RequestException as e:
-        print(f"Error fetching lyrics: {e}")
+        print(f"Error fetching lyrics for {song_title} by {artist_name}: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     return None, None, None

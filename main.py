@@ -103,22 +103,30 @@ def theme_search():
         tracks = get_artist_tracks(sp, artist_id)
         
         relevant_songs = []
-        for track in tracks:
-            song_name = track['name']
-            lyrics, genius_url, release_date = get_lyrics_and_info(song_name, artist_name)
-            if lyrics and analyze_lyrics(lyrics, query):
-                relevant_songs.append({
-                    'artist': artist_name,
-                    'title': song_name,
-                    'year': release_date,
-                    'url': genius_url
-                })
+        for track in tracks[:50]:  # Limit to first 50 tracks for now
+            try:
+                song_name = track['name']
+                lyrics, genius_url, release_date = get_lyrics_and_info(song_name, artist_name)
+                if lyrics:
+                    # Process lyrics in chunks if too long
+                    chunks = [lyrics[i:i+1000] for i in range(0, len(lyrics), 1000)]
+                    for chunk in chunks:
+                        if analyze_lyrics(chunk, query):
+                            relevant_songs.append({
+                                'artist': artist_name,
+                                'title': song_name,
+                                'year': release_date,
+                                'url': genius_url
+                            })
+                            break
+            except Exception as e:
+                app.logger.error(f"Error processing track {song_name}: {str(e)}")
         
         return render_template('themeSearchResults.html', 
                                query=query,
                                relevant_songs=relevant_songs)
     except Exception as e:
-        app.logger.error(f"An error occurred: {str(e)}")
+        app.logger.error(f"An error occurred in theme_search: {str(e)}")
         return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
 
 # Error handling for 404 and 500 errors
