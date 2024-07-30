@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from lyrics_analysis import analyze_lyrics
+from lyrics_api import get_lyrics_and_info
 from spotify_api import get_spotify_client, get_artist_id, get_artist_tracks, get_spotify_oauth
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+print("GENIUS_API_TOKEN:", os.getenv("GENIUS_API_TOKEN"))
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -82,7 +85,51 @@ def search():
                            seconds=seconds)
                         #    featured_artists=featured_artists)  # Pass this to template if needed
 
+@app.route('/theme_search', methods=['POST'])
+def theme_search():
+    query = request.form['query']
+    artist_name = request.form['artist']
+    
+    if 'token_info' not in session:
+        return redirect('/login')
+    
+    try:
+        sp = get_spotify_client()
+        
+        artist_id = get_artist_id(sp, artist_name)
+        if not artist_id:
+            return render_template('error.html', error=f"Artist {artist_name} not found."), 404
 
+        tracks = get_artist_tracks(sp, artist_id)
+        
+        relevant_songs = []
+        for track in tracks:
+            song_name = track['name']
+            lyrics, genius_url, release_date = get_lyrics_and_info(song_name, artist_name)
+            if lyrics and analyze_lyrics(lyrics, query):
+                relevant_songs.append({
+                    'artist': artist_name,
+                    'title': song_name,
+                    'year': release_date,
+                    'url': genius_url
+                })
+        
+        return render_template('themeSearchResults.html', 
+                               query=query,
+                               relevant_songs=relevant_songs)
+    except Exception as e:
+        app.logger.error(f"An error occurred: {str(e)}")
+        return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
+
+# Error handling for 404 and 500 errors
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error="Page not found"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    app.logger.error(f"Internal error: {str(error)}")
+    return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
 
 @app.route('/login')
 def login():

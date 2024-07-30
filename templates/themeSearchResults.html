@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #282828;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1DB954;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        th {
+            background-color: #1DB954;
+            color: #ffffff;
+        }
+        a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: block;
+            width: 150px;
+            margin: 20px auto 0;
+            padding: 10px;
+            background-color: #1DB954;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #1ed760;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Results for "{{ query }}"</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Artist</th>
+                    <th>Song Title</th>
+                    <th>Year of Release</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for song in relevant_songs %}
+                    <tr>
+                        <td>{{ song.artist }}</td>
+                        <td><a href="{{ song.url }}" target="_blank">{{ song.title }}</a></td>
+                        <td>{{ song.year }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/" class="back-button">Back to Search</a>
+    </div>
+</body>
+</html>
