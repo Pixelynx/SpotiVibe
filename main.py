@@ -1,3 +1,4 @@
+from math import ceil
 from flask import Flask, render_template, request, redirect, url_for, session
 from lyrics_analysis import analyze_lyrics
 from lyrics_api import get_lyrics_and_info
@@ -6,7 +7,6 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-print("GENIUS_API_TOKEN:", os.getenv("GENIUS_API_TOKEN"))
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -85,10 +85,22 @@ def search():
                            seconds=seconds)
                         #    featured_artists=featured_artists)  # Pass this to template if needed
 
-@app.route('/theme_search', methods=['POST'])
+@app.route('/theme_search', methods=['POST', 'GET'])
 def theme_search():
-    query = request.form['query']
-    artist_name = request.form['artist']
+    if request.method == 'POST':
+        query = request.form['query']
+        artist_name = request.form['artist']
+        session['query'] = query
+        session['artist_name'] = artist_name
+        return redirect(url_for('theme_search'))
+
+    query = session.get('query')
+    artist_name = session.get('artist_name')
+    page = request.args.get('page', 1, type=int)
+    per_page = 25
+
+    if not query or not artist_name:
+        return redirect(url_for('index'))
     
     if 'token_info' not in session:
         return redirect('/login')
@@ -121,10 +133,19 @@ def theme_search():
                             break
             except Exception as e:
                 app.logger.error(f"Error processing track {song_name}: {str(e)}")
+
+        total_results = len(relevant_songs)
+        total_pages = ceil(total_results / per_page)
+        start = (page - 1) * per_page
+        end = start + per_page
+        paginated_songs = relevant_songs[start:end]
         
-        return render_template('themeSearchResults.html', 
+        return render_template('themeSearchResults.html',
+                               page=page,
                                query=query,
-                               relevant_songs=relevant_songs)
+                               relevant_songs=paginated_songs,
+                               total_pages=total_pages,
+                               total_results=total_results)
     except Exception as e:
         app.logger.error(f"An error occurred in theme_search: {str(e)}")
         return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
