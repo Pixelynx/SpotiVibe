@@ -101,7 +101,7 @@ def theme_search():
 
     if not query or not artist_name:
         return redirect(url_for('index'))
-    
+
     if 'token_info' not in session:
         return redirect('/login')
     
@@ -115,12 +115,22 @@ def theme_search():
         tracks = get_artist_tracks(sp, artist_id)
         
         relevant_songs = []
-        for track in tracks[:50]:  # Limit to first 50 tracks for now
+        analyzed_songs = set()  # Set to keep track of analyzed songs
+
+        for track in tracks:
             try:
                 song_name = track['name']
+                # Create a unique identifier for the song
+                song_id = f"{song_name.lower()}_{artist_name.lower()}"
+                
+                # Skip if we've already analyzed this song
+                if song_id in analyzed_songs:
+                    continue
+                
+                analyzed_songs.add(song_id)  # Mark as analyzed
+
                 lyrics, genius_url, release_date = get_lyrics_and_info(song_name, artist_name)
                 if lyrics:
-                    # Process lyrics in chunks if too long
                     chunks = [lyrics[i:i+1000] for i in range(0, len(lyrics), 1000)]
                     for chunk in chunks:
                         if analyze_lyrics(chunk, query):
@@ -130,7 +140,7 @@ def theme_search():
                                 'year': release_date,
                                 'url': genius_url
                             })
-                            break
+                            break  # No need to check other chunks if it's relevant
             except Exception as e:
                 app.logger.error(f"Error processing track {song_name}: {str(e)}")
 
@@ -139,8 +149,8 @@ def theme_search():
         start = (page - 1) * per_page
         end = start + per_page
         paginated_songs = relevant_songs[start:end]
-        
-        return render_template('themeSearchResults.html',
+
+        return render_template('themeSearchResults.html', 
                                page=page,
                                query=query,
                                relevant_songs=paginated_songs,
