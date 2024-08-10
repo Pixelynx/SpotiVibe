@@ -85,14 +85,14 @@ def search():
                            seconds=seconds)
                         #    featured_artists=featured_artists)  # Pass this to template if needed
 
-@app.route('/theme_search', methods=['POST', 'GET'])
-def theme_search():
+@app.route('/vibe_search', methods=['POST', 'GET'])
+def vibe_search():
     if request.method == 'POST':
         query = request.form['query']
         artist_name = request.form['artist']
         session['query'] = query
         session['artist_name'] = artist_name
-        return redirect(url_for('theme_search'))
+        return redirect(url_for('vibe_search'))
 
     query = session.get('query')
     artist_name = session.get('artist_name')
@@ -150,14 +150,14 @@ def theme_search():
         end = start + per_page
         paginated_songs = relevant_songs[start:end]
 
-        return render_template('themeSearchResults.html', 
+        return render_template('vibeSearchResults.html', 
                                page=page,
                                query=query,
                                relevant_songs=paginated_songs,
                                total_pages=total_pages,
                                total_results=total_results)
     except Exception as e:
-        app.logger.error(f"An error occurred in theme_search: {str(e)}")
+        app.logger.error(f"An error occurred in vibe_search: {str(e)}")
         return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
 
 # Error handling for 404 and 500 errors

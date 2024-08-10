@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theme Search Results</title>
+    <title>Vibe Search Results</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -105,17 +105,17 @@
         </table>
         <div class="pagination">
             {% if page > 1 %}
-                <a href="{{ url_for('theme_search', page=page-1) }}">&laquo; Previous</a>
+                <a href="{{ url_for('vibe_search', page=page-1) }}">&laquo; Previous</a>
             {% endif %}
             {% for i in range(1, total_pages + 1) %}
                 {% if i == page %}
-                    <a href="{{ url_for('theme_search', page=i) }}" class="active">{{ i }}</a>
+                    <a href="{{ url_for('vibe_search', page=i) }}" class="active">{{ i }}</a>
                 {% else %}
-                    <a href="{{ url_for('theme_search', page=i) }}">{{ i }}</a>
+                    <a href="{{ url_for('vibe_search', page=i) }}">{{ i }}</a>
                 {% endif %}
             {% endfor %}
             {% if page < total_pages %}
-                <a href="{{ url_for('theme_search', page=page+1) }}">Next &raquo;</a>
+                <a href="{{ url_for('vibe_search', page=page+1) }}">Next &raquo;</a>
             {% endif %}
         </div>
         <a href="/" class="back-button">Back to Search</a>
