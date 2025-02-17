@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Search</title>
+    <title>SpotiVibe</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,11 +16,25 @@
             margin: 0;
         }
         .search-container {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
             background-color: #282828;
-            padding: 2rem;
+            padding: 5rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            background: linear-gradient(145deg, #3a3a3a, #282828);
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.2),
+                0 15px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 8px 15px rgba(0, 0, 0, 0.25),
+                0 20px 50px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, #404040, #2e2e2e);
         }
         h1 {
             margin-bottom: 1.5rem;
@@ -61,34 +75,52 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
             transition: background-color 0.3s ease;
+        }
+        .tab:hover {
+            background-color: #3a3a3a;
         }
         .tab.active {
             background-color: #1DB954;
         }
+        .tab.active:hover {
+            background-color: #1ed760;
+        }
         .search-form {
             display: none;
         }
+
         .search-form.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
+
+        .search-form input[type="text"],
+        .search-form input[type="submit"] {
+            width: 100%;
+            max-width: 300px;
+        }
+
     </style>
 </head>
 <body>
     <div class="search-container">
-        <h1>Spotify Search</h1>
+        <h1>SpotiVibe</h1>
         <div class="tab-container">
-            <button class="tab active" onclick="showTab('artist')">Artist Search</button>
+            <button class="tab active" onclick="showTab('duration')">Catalog Duration</button>
             <button class="tab" onclick="showTab('vibe')">Vibe Search</button>
         </div>
-        <form id="artistSearch" class="search-form active" action="/search" method="POST">
+        <form id="duration-search" class="search-form active" action="/catalog_duration" method="POST">
             <input type="text" name="artist" placeholder="Enter artist name" required>
-            <input type="submit" value="Search Artist">
+            <input type="submit" value="Calculate Duration">
         </form>
-        <form id="vibeSearch" class="search-form" action="/vibe_search" method="POST">
+        <form id="vibe-search" class="search-form" action="/vibe_search" method="POST">
             <input type="text" name="query" placeholder="Enter vibe or phrase" required>
             <input type="text" name="artist" placeholder="Enter artist name" required>
-            <input type="submit" value="Search Vibe">
+            <input type="submit" value="Catch A Vibe">
         </form>
     </div>
 
@@ -103,7 +135,7 @@
             }
             
             document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}Search`).classList.add('active');
+            document.getElementById(`${tabName}-search`).classList.add('active');
         }
     </script>
 </body>

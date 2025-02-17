@@ -23,7 +23,7 @@ def get_lyrics_and_info(song_title, artist_name):
         'Authorization': f'Bearer {GENIUS_API_TOKEN}',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-    search_url = f"{base_url}/search"
+    search_url = f"{base_url}/catalog_duration"
     data = {'q': f"{song_title} {artist_name}"}
     
     try:

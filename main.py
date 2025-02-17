@@ -20,10 +20,10 @@ def calculate_total_duration(tracks):
 
 @app.route('/')
 def index():
-    return render_template('search.html')
+    return render_template('catalogDuration.html')
 
-@app.route('/search', methods=['POST'])
-def search():
+@app.route('/catalog_duration', methods=['POST'])
+def catalog_duration():
     artist_name = request.form['artist']
     
     # Check if user is authenticated
