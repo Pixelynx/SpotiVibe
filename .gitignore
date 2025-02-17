@@ -13,6 +13,7 @@ SpPy.txt
 
 # Virtual environment
 venv/
+venv2/
 
 # Misc
 reflections.md

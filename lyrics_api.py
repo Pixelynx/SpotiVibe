@@ -3,8 +3,11 @@ import random
 import re
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import time
+
+load_dotenv()
 
 GENIUS_API_TOKEN = os.getenv("GENIUS_API_TOKEN")
 RATE_LIMIT_DELAY = 1  # 1 second delay between requests
@@ -14,7 +17,7 @@ if not GENIUS_API_TOKEN:
 
 def get_lyrics_and_info(song_title, artist_name):
     print(f"Searching for lyrics: {song_title} by {artist_name}")
-    time.sleep(random.uniform(1, 3))  # Random delay between requests
+    time.sleep(random.uniform(2, 5))  # Random delay between requests
     base_url = "https://api.genius.com"
     headers = {
         'Authorization': f'Bearer {GENIUS_API_TOKEN}',

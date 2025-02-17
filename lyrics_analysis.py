@@ -1,7 +1,7 @@
 from transformers import pipeline
 
 # Initialize the NLP model
-classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+classifier = pipeline("zero-shot-classification", model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")
 
 def analyze_lyrics(lyrics, query):
     try:
@@ -12,7 +12,7 @@ def analyze_lyrics(lyrics, query):
         print(f"Classification result for query '{query}': {result}")
         
         # Check if the query is the top label AND the score is above a certain threshold
-        is_relevant = result['labels'][0] == query and result['scores'][0] > 0.8
+        is_relevant = result['labels'][0] == query and result['scores'][0] > 0.5
         
         print(f"Is relevant: {is_relevant}")
         

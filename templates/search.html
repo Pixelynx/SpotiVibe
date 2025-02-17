@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Artist Search</title>
+    <title>Spotify Search</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,21 +50,61 @@
         input[type="submit"]:hover {
             background-color: #1ed760;
         }
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .tab.active {
+            background-color: #1DB954;
+        }
+        .search-form {
+            display: none;
+        }
+        .search-form.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="search-container">
-        <h1>Spotify Artist Search</h1>
-        <form action="/search" method="POST">
+        <h1>Spotify Search</h1>
+        <div class="tab-container">
+            <button class="tab active" onclick="showTab('artist')">Artist Search</button>
+            <button class="tab" onclick="showTab('vibe')">Vibe Search</button>
+        </div>
+        <form id="artistSearch" class="search-form active" action="/search" method="POST">
             <input type="text" name="artist" placeholder="Enter artist name" required>
-            <input type="submit" value="Search">
+            <input type="submit" value="Search Artist">
         </form>
-        <h1>Search by Vibe</h1>
-        <form action="/vibe_search" method="POST">
+        <form id="vibeSearch" class="search-form" action="/vibe_search" method="POST">
             <input type="text" name="query" placeholder="Enter vibe or phrase" required>
             <input type="text" name="artist" placeholder="Enter artist name" required>
-            <input type="submit" value="Search">
+            <input type="submit" value="Search Vibe">
         </form>
     </div>
+
+    <script>
+        function showTab(tabName) {
+            const tabs = document.getElementsByClassName('tab');
+            const forms = document.getElementsByClassName('search-form');
+            
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                forms[i].classList.remove('active');
+            }
+            
+            document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Search`).classList.add('active');
+        }
+    </script>
 </body>
 </html>
