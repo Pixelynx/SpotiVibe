@@ -5,6 +5,9 @@ This application utilizes the Spotify API to search for songs based on a given "
 1.  Vibe Search: Users can input a word or phrase that represents a certain vibe, and the application searches for songs with similar vibes.
 2.  Artist Music Time Calculator: The app calculates and displays the total duration of an artist's music catalog on Spotify.
 
+### Demo v1:
+<video src="./assets/vid/SpotiVibe-v1-demo.mp4" width="320" height="240" controls></video>
+
 ## Features
 
 -   User authentication with Spotify
