@@ -92,8 +92,13 @@ def vibe_search():
         artist_name = request.form['artist']
         session['query'] = query
         session['artist_name'] = artist_name
-        return redirect(url_for('vibe_search'))
+        return render_template('loading.html', next_url=url_for('process_vibe_search'))
 
+    return render_template('vibeSearch.html')
+
+
+@app.route('/process_vibe_search')
+def process_vibe_search():
     query = session.get('query')
     artist_name = session.get('artist_name')
     page = request.args.get('page', 1, type=int)
@@ -115,7 +120,7 @@ def vibe_search():
         tracks = get_artist_tracks(sp, artist_id)
         
         relevant_songs = []
-        analyzed_songs = set()  # Set to keep track of analyzed songs
+        analyzed_songs = set()
 
         for track in tracks:
             try:
@@ -157,7 +162,7 @@ def vibe_search():
                                total_pages=total_pages,
                                total_results=total_results)
     except Exception as e:
-        app.logger.error(f"An error occurred in vibe_search: {str(e)}")
+        app.logger.error(f"An error occurred in process_vibe_search: {str(e)}")
         return render_template('error.html', error="An unexpected error occurred. Please try again later."), 500
 
 # Error handling for 404 and 500 errors

@@ -20,3 +20,7 @@ def analyze_lyrics(lyrics, query):
     except Exception as e:
         print(f"Error analyzing lyrics: {e}")
         return False
+    
+
+# facebook/bart-large-mnli npl
+# MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
