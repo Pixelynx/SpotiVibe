@@ -6,7 +6,7 @@ This application utilizes the Spotify API to search for songs based on a given "
 2.  Artist Music Time Calculator: The app calculates and displays the total duration of an artist's music catalog on Spotify.
 
 ### Demo v1:
-<video src="./assets/vid/SpotiVibe-v1-demo.mp4" width="320" height="240" controls></video>
+![SpotiVibe-v1-demo](https://github.com/user-attachments/assets/3864efe8-11b4-477a-8883-f988b48c4b49)
 
 ## Features
 
