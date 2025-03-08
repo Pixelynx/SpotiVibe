@@ -87,6 +87,16 @@
         .tab.active:hover {
             background-color: #1ed760;
         }
+        .checkbox-container {
+            display: flex;
+            flex-direction: row;
+        }
+        #artist-cb-container {
+            padding-right: 1rem;
+        }
+        #genre-cb-container {
+            padding-left: 1rem;
+        }
         .search-form {
             display: none;
         }
@@ -118,8 +128,27 @@
             <input type="submit" value="Calculate Duration">
         </form>
         <form id="vibe-search" class="search-form" action="/vibe_search" method="POST">
-            <input type="text" name="query" placeholder="Enter vibe or phrase" required>
-            <input type="text" name="artist" placeholder="Enter artist name" required>
+            <div class="checkbox-container">
+                <div id="artist-cb-container">
+                    <input disabled type="checkbox" id="artist-checkbox" onclick="toggleInput('artist')">
+                    <label for="artist-checkbox">Artist</label>
+                </div>
+                <div id="genre-cb-container">
+                    <input disabled type="checkbox" id="genre-checkbox" onclick="toggleInput('genre')">
+                    <label for="genre-checkbox">Genre</label>
+                </div>
+            </div>
+            <div>
+                <input type="text" name="query" placeholder="Enter vibe or phrase" required>
+                <input type="text" id="artist-input" name="artist" placeholder="Enter artist name" style="display:block;">
+                <select id="genre-select" name="genre" style="display:none;">
+                    <option value="pop">Pop</option>
+                    <option value="hip hop">Hip Hop</option>
+                    <option value="r&b">R&B</option>
+                    <option value="country">Country</option>
+                    <!-- TODO: add more genres -->
+                </select>
+            </div>
             <input type="submit" value="Catch A Vibe">
         </form>
     </div>
@@ -136,6 +165,17 @@
             
             document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
             document.getElementById(`${tabName}-search`).classList.add('active');
+        }
+
+        function toggleInput(type) {
+            const input = document.getElementById(`${type}-input`);
+            const select = document.getElementById(`${type}-select`);
+            // if (input) {
+            //     input.style.display = input.style.display === 'none' ? 'block' : 'none';
+            // }
+            if (select) {
+                select.style.display = select.style.display === 'none' ? 'block' : 'none';
+            }
         }
     </script>
 </body>
