@@ -25,6 +25,18 @@ This application utilizes the Spotify API to search for songs based on a given "
 5.  **Lyrics Analysis**: The app uses a zero-shot classification model to analyze lyrics and determine if they match the given vibe.
 6.  **Pagination**: Search results are paginated for better user experience.
 
+## Search Filters
+
+The application supports more flexible search options for the Vibe Search feature:
+
+- **Vibe Only**: Users can search for songs based solely on a vibe or phrase.
+- **Vibe and Artist**: Users can refine their search by specifying an artist along with the vibe.
+- **Vibe and Genre**: Users can further narrow down the search by selecting a genre in addition to the vibe.
+- **Vibe, Artist, and Genre**: Users can combine all three filters for a highly specific search.
+
+### Note:
+- The genre filter is currently in a preliminary stage and may require further refinement to ensure accurate filtering based on genre. This is an area identified for improvement and will be addressed in future updates.
+
 ## Areas for Improvement
 
 1.  **Performance Optimization**: The app currently has issues with long request times, especially for artists with large discographies. This needs to be optimized, possibly by implementing caching or batch processing.

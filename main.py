@@ -101,6 +101,7 @@ def vibe_search():
 def process_vibe_search():
     query = session.get('query')
     artist_name = session.get('artist_name')
+    genre = request.form.get('genre')
     page = request.args.get('page', 1, type=int)
     per_page = 25
 
@@ -122,9 +123,21 @@ def process_vibe_search():
         relevant_songs = []
         analyzed_songs = set()
 
+        # Check if artist or genre is provided
+        artist_filter = artist_name if artist_name else None
+        genre_filter = genre if genre else None
+
         for track in tracks:
             try:
                 song_name = track['name']
+                track_genre = track.get('genre', '').lower()
+                
+                # Apply filters
+                if artist_filter and artist_filter.lower() not in [artist['name'].lower() for artist in track['artists']]:
+                    continue
+                if genre_filter and genre_filter.lower() != track_genre: # TODO: Investigate genre filter not applying
+                    continue
+
                 # Create a unique identifier for the song
                 song_id = f"{song_name.lower()}_{artist_name.lower()}"
                 
