@@ -6,11 +6,11 @@ import {
   Typography, 
   Button, 
   Paper, 
-  CircularProgress,
   ThemeProvider,
   createTheme
 } from '@mui/material';
 import SearchResults from '../components/VibeSearch/SearchResults.tsx';
+import Loading from '../components/common/Loading.tsx';
 import '../styles/VibeSearchPage.css';
 import { API_BASE_URL } from '../config.ts';
 
@@ -106,27 +106,6 @@ const VibeSearchPage: React.FC = () => {
     },
   });
 
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-          }}
-        >
-          <CircularProgress color="primary" size={60} thickness={4} />
-          <Typography variant="h6" sx={{ mt: 3 }}>
-            Searching vibes in {artist}'s catalog...
-          </Typography>
-        </Box>
-      </ThemeProvider>
-    );
-  }
-
   if (error) {
     return (
       <ThemeProvider theme={theme}>
@@ -183,11 +162,9 @@ const VibeSearchPage: React.FC = () => {
               Vibe Search Results
             </Typography>
             
-            {results && (
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Showing songs matching "{results.query}" by {artist}
-              </Typography>
-            )}
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Showing songs matching "{query}" by {artist}
+            </Typography>
             
             <Button
               variant="contained"
@@ -207,13 +184,28 @@ const VibeSearchPage: React.FC = () => {
             </Button>
           </Paper>
 
-          {results && (
-            <SearchResults 
-              results={results} 
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
+          <Box sx={{ position: 'relative', minHeight: '300px' }}>
+            <Loading 
+              isLoading={loading} 
+              message="Searching for vibes..."
             />
-          )}
+            
+            <Box sx={{ 
+              opacity: loading ? 0.7 : 1,
+              transition: 'opacity 0.3s ease'
+            }}>
+              <SearchResults 
+                results={results || { 
+                  relevant_songs: [], 
+                  total_pages: 0, 
+                  total_results: 0, 
+                  query: query || "" 
+                }} 
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </Box>
+          </Box>
         </Box>
       </Container>
     </ThemeProvider>

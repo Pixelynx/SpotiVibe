@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline, CircularProgress, Box, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, Box, ThemeProvider, createTheme } from '@mui/material';
 import Home from './pages/Home.tsx';
 import DurationPage from './pages/DurationPage.tsx';
 import VibeSearchPage from './pages/VibeSearchPage.tsx';
@@ -75,30 +75,33 @@ const App: React.FC = () => {
     login
   };
 
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            bgcolor: '#121212',
-          }}
-        >
-          <CircularProgress color="primary" size={60} />
-        </Box>
-      </ThemeProvider>
-    );
-  }
-
   return (
     <AuthContext.Provider value={authContextValue}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Box className="App">
+          <Box className="App" sx={{ position: 'relative', minHeight: '100vh' }}>
+            {loading && (
+              <Box
+                sx={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(18, 18, 18, 0.85)',
+                  zIndex: 1200,
+                }}
+              >
+                <Loading 
+                  isLoading={loading} 
+                  message="Connecting to Spotify..." 
+                />
+              </Box>
+            )}
             <Routes>
               <Route path="/" element={<Home />} />
               <Route
@@ -125,7 +128,6 @@ const App: React.FC = () => {
                   <Navigate to="/" />
                 }
               />
-              <Route path="/loading" element={<Loading />} />
             </Routes>
           </Box>
         </Router>

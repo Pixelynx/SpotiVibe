@@ -12,10 +12,10 @@ import {
   TableContainer, 
   TableHead, 
   TableRow,
-  CircularProgress,
   ThemeProvider,
   createTheme
 } from '@mui/material';
+import Loading from '../components/common/Loading.tsx';
 import '../styles/DurationPage.css';
 import { API_BASE_URL } from '../config.ts';
 
@@ -110,27 +110,6 @@ const DurationPage: React.FC = () => {
     },
   });
 
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-          }}
-        >
-          <CircularProgress color="primary" size={60} thickness={4} />
-          <Typography variant="h6" sx={{ mt: 3 }}>
-            Calculating duration for {artist}...
-          </Typography>
-        </Box>
-      </ThemeProvider>
-    );
-  }
-
   if (error) {
     return (
       <ThemeProvider theme={theme}>
@@ -162,10 +141,6 @@ const DurationPage: React.FC = () => {
     );
   }
 
-  if (!data) {
-    return null;
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="lg">
@@ -188,7 +163,7 @@ const DurationPage: React.FC = () => {
                 fontWeight: 'bold',
               }}
             >
-              Catalog Duration for {data.artist_name}
+              Catalog Duration for {artist}
             </Typography>
             
             <Paper 
@@ -202,7 +177,7 @@ const DurationPage: React.FC = () => {
               }}
             >
               <Typography variant="h6">
-                Total Time: {data.duration.hours}h {data.duration.minutes}m {data.duration.seconds}s
+                Total Time: {data ? `${data.duration.hours}h ${data.duration.minutes}m ${data.duration.seconds}s` : '0h 0m 0s'}
               </Typography>
             </Paper>
             
@@ -224,32 +199,49 @@ const DurationPage: React.FC = () => {
             </Button>
           </Paper>
 
-          <TableContainer 
-            component={Paper} 
-            sx={{ 
-              borderRadius: 2,
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  {data.artists.map((artist, index) => (
-                    <TableCell key={index}>{artist}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.song_table.map((row, rowIndex) => (
-                  <TableRow key={rowIndex} hover>
-                    {row.map((song, colIndex) => (
-                      <TableCell key={colIndex}>{song}</TableCell>
+          <Box sx={{ position: 'relative', minHeight: '300px' }}>
+            <Loading 
+              isLoading={loading} 
+              message="Calculating song durations..."
+            />
+            
+            <TableContainer 
+              component={Paper} 
+              sx={{ 
+                borderRadius: 2,
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                opacity: loading ? 0.7 : 1,
+                transition: 'opacity 0.3s ease',
+              }}
+            >
+              {data ? (
+                <Table sx={{ minWidth: 650 }}>
+                  <TableHead>
+                    <TableRow>
+                      {data.artists.map((artist, index) => (
+                        <TableCell key={index}>{artist}</TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.song_table.map((row, rowIndex) => (
+                      <TableRow key={rowIndex} hover>
+                        {row.map((song, colIndex) => (
+                          <TableCell key={colIndex}>{song}</TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableBody>
+                </Table>
+              ) : (
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="body1" color="text.secondary">
+                    Loading song information...
+                  </Typography>
+                </Box>
+              )}
+            </TableContainer>
+          </Box>
         </Box>
       </Container>
     </ThemeProvider>
