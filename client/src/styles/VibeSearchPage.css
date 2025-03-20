@@ -1,0 +1,61 @@
+.vibe-search-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.vibe-search-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.vibe-search-header h1 {
+  color: #1DB954;
+  margin-bottom: 0.5rem;
+}
+
+.vibe-search-header p {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.back-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #1DB954;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.back-button:hover {
+  background-color: #1ed760;
+  transform: translateY(-2px);
+}
+
+.vibe-search-page.loading, .vibe-search-page.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(29, 185, 84, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+} 
