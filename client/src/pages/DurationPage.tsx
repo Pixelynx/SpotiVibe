@@ -17,6 +17,7 @@ import {
   createTheme
 } from '@mui/material';
 import '../styles/DurationPage.css';
+import { API_BASE_URL } from '../config.ts';
 
 interface DurationData {
   artist_name: string;
@@ -49,7 +50,7 @@ const DurationPage: React.FC = () => {
 
     const fetchDuration = async () => {
       try {
-        const response = await fetch('/api/catalog_duration', {
+        const response = await fetch(`${API_BASE_URL}/api/catalog_duration`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

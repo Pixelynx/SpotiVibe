@@ -7,6 +7,7 @@ import VibeSearchPage from './pages/VibeSearchPage.tsx';
 import SearchResults from './components/VibeSearch/SearchResults.tsx';
 import Loading from './components/common/Loading.tsx';
 import AuthContext, { AuthContextType } from './contexts/AuthContext.tsx';
+import { API_BASE_URL } from './config.ts';
 
 const App: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(false);
@@ -15,7 +16,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await fetch('/api/auth_status');
+        const response = await fetch(`${API_BASE_URL}/api/auth_status`, {
+          credentials: 'include'
+        });
         const data = await response.json();
         setAuthenticated(data.authenticated);
       } catch (error) {
@@ -30,7 +33,9 @@ const App: React.FC = () => {
 
   const login = async () => {
     try {
-      const response = await fetch('/api/login');
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       window.location.href = data.auth_url;
     } catch (error) {
@@ -106,7 +111,19 @@ const App: React.FC = () => {
               />
               <Route
                 path="/search-results"
-                element={authenticated ? <SearchResults results={null} currentPage={1} onPageChange={() => {}} /> : <Navigate to="/" />}
+                element={authenticated ? 
+                  <SearchResults 
+                    results={{ 
+                      relevant_songs: [], 
+                      total_pages: 0, 
+                      total_results: 0, 
+                      query: "" 
+                    }} 
+                    currentPage={1} 
+                    onPageChange={() => {}} 
+                  /> : 
+                  <Navigate to="/" />
+                }
               />
               <Route path="/loading" element={<Loading />} />
             </Routes>

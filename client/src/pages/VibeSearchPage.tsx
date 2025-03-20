@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import SearchResults from '../components/VibeSearch/SearchResults.tsx';
 import '../styles/VibeSearchPage.css';
+import { API_BASE_URL } from '../config.ts';
 
 interface SearchResult {
   query: string;
@@ -50,7 +51,7 @@ const VibeSearchPage: React.FC = () => {
 
     const searchVibe = async () => {
       try {
-        const response = await fetch('/api/vibe_search', {
+        const response = await fetch(`${API_BASE_URL}/api/vibe_search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
