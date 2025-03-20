@@ -16,7 +16,7 @@ def callback():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     session["token_info"] = token_info
-    return redirect('/')
+    return redirect('http://localhost:3000')
 
 @auth_bp.route('/api/auth_status')
 def auth_status():

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
+import traceback
 
 from api.catalog_routes import catalog_bp
 from api.vibe_routes import vibe_bp
@@ -15,8 +16,12 @@ def create_app():
     # Configure app
     app.secret_key = os.urandom(24)
     
-    # Enable CORS for the React app
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+    # Enable CORS for the React app - allow all routes from localhost:3000
+    CORS(app, 
+         origins=["http://localhost:3000"],
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "OPTIONS"])
     
     # Register blueprints
     app.register_blueprint(catalog_bp)
@@ -30,6 +35,7 @@ def create_app():
     @app.errorhandler(500)
     def internal_error(error):
         app.logger.error(f"Internal error: {str(error)}")
+        app.logger.error(traceback.format_exc())
         return {"error": "An unexpected error occurred"}, 500
     
     return app
