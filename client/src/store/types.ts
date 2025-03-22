@@ -36,6 +36,20 @@ export interface Image {
   width: number;
 }
 
+export interface VibeSong {
+  id?: string;
+  title: string;
+  artist: string;
+  year?: string;
+  url?: string;
+}
+
+export interface YearOption {
+  id: string;
+  year: string;
+  isSelected: boolean;
+}
+
 export interface CatalogState {
   selectedArtist: string;
   searchedArtist: string;
@@ -61,8 +75,27 @@ export interface CatalogState {
   error: string | null;
 }
 
+export interface VibeSearchState {
+  query: string;
+  artist: string;
+  songs: VibeSong[];
+  allSongs: VibeSong[];
+  yearOptions: YearOption[];
+  selectedYear: string;
+  isFiltered: boolean;
+  filteredSongs: VibeSong[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+  };
+  loading: boolean;
+  error: string | null;
+}
+
 export interface RootState {
   catalog: CatalogState;
+  vibeSearch: VibeSearchState;
 }
 
 export enum CatalogActionTypes {
@@ -79,4 +112,18 @@ export enum CatalogActionTypes {
   
   SET_PAGINATION = 'catalog/SET_PAGINATION',
   CHANGE_PAGE = 'catalog/CHANGE_PAGE'
+}
+
+export enum VibeSearchActionTypes {
+  SEARCH_VIBE_REQUEST = 'vibeSearch/SEARCH_VIBE_REQUEST',
+  SEARCH_VIBE_SUCCESS = 'vibeSearch/SEARCH_VIBE_SUCCESS',
+  SEARCH_VIBE_FAILURE = 'vibeSearch/SEARCH_VIBE_FAILURE',
+  
+  SET_YEAR_OPTIONS = 'vibeSearch/SET_YEAR_OPTIONS',
+  SELECT_YEAR = 'vibeSearch/SELECT_YEAR',
+  FILTER_SONGS = 'vibeSearch/FILTER_SONGS',
+  RESET_FILTER = 'vibeSearch/RESET_FILTER',
+  
+  SET_SEARCH_PARAMS = 'vibeSearch/SET_SEARCH_PARAMS',
+  CHANGE_VIBE_PAGE = 'vibeSearch/CHANGE_VIBE_PAGE'
 } 

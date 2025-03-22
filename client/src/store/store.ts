@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import catalogReducer from './slices/catalogSlice.ts';
+import vibeSearchReducer from './slices/vibeSearchSlice.ts';
 
 export const store = configureStore({
   reducer: {
     catalog: catalogReducer,
-    // TODO: other reducers
+    vibeSearch: vibeSearchReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

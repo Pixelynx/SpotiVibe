@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import '../styles/Home.css';
 import AuthContext, { AuthContextType } from '../contexts/AuthContext.tsx';
+import { useAppDispatch } from '../store/hooks.ts';
+import { searchVibe } from '../store/actions/vibeSearchActions.ts';
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -46,6 +48,7 @@ const Home: React.FC = () => {
   const [vibeArtist, setVibeArtist] = useState<string>('');
   const { authenticated, login } = useContext<AuthContextType>(AuthContext);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -71,6 +74,8 @@ const Home: React.FC = () => {
     }
     
     if (!vibeQuery || !vibeArtist) return;
+    
+    dispatch(searchVibe({ query: vibeQuery, artist: vibeArtist, page: 1 }));
     
     navigate('/vibe-search', { 
       state: { 

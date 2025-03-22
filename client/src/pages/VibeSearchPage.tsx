@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -9,23 +9,18 @@ import {
   ThemeProvider,
   createTheme
 } from '@mui/material';
-import SearchResults from '../components/VibeSearch/SearchResults.tsx';
+import YearFilter from '../components/VibeSearch/YearFilter.tsx';
 import Loading from '../components/common/Loading.tsx';
 import '../styles/VibeSearchPage.css';
-import { API_BASE_URL } from '../config.ts';
-
-interface SearchResult {
-  query: string;
-  relevant_songs: Array<{
-    title: string;
-    artist: string;
-    year?: string;
-    url?: string;
-  }>;
-  total_pages: number;
-  total_results: number;
-  current_page: number;
-}
+import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
+import { searchVibe } from '../store/actions/vibeSearchActions.ts';
+import { 
+  selectVibeLoading, 
+  selectVibeError,
+  selectVibeQuery,
+  selectVibeArtist
+} from '../store/selectors/vibeSearchSelectors.ts';
+import SearchResults from 'components/VibeSearch/SearchResults.tsx';
 
 interface LocationState {
   params: {
@@ -35,10 +30,12 @@ interface LocationState {
 }
 
 const VibeSearchPage: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<SearchResult | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(selectVibeLoading);
+  const error = useAppSelector(selectVibeError);
+  const reduxQuery = useAppSelector(selectVibeQuery);
+  const reduxArtist = useAppSelector(selectVibeArtist);
+  
   const location = useLocation();
   const navigate = useNavigate();
   const { query, artist } = (location.state?.params as { query: string; artist: string }) || {};
@@ -49,42 +46,11 @@ const VibeSearchPage: React.FC = () => {
       return;
     }
 
-    const searchVibe = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/vibe_search`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            query, 
-            artist, 
-            page: currentPage 
-          }),
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to search vibe');
-        }
-
-        const result = await response.json();
-        setResults(result);
-        setLoading(false);
-      } catch (err) {
-        setError((err as Error).message);
-        setLoading(false);
-      }
-    };
-
-    searchVibe();
-  }, [query, artist, currentPage, navigate]);
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    setLoading(true);
-  };
+    // Only dispatch search if we have new search parameters
+    if (query !== reduxQuery || artist !== reduxArtist) {
+      dispatch(searchVibe({ query, artist, page: 1 }));
+    }
+  }, [query, artist, reduxQuery, reduxArtist, dispatch, navigate]);
 
   const handleBackClick = () => {
     navigate('/');
@@ -166,44 +132,49 @@ const VibeSearchPage: React.FC = () => {
               Showing songs matching "{query}" by {artist}
             </Typography>
             
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleBackClick}
-              sx={{
-                mb: 3,
-                backgroundColor: '#1DB954',
-                '&:hover': {
-                  backgroundColor: '#1ed760',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.3s ease',
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 2, 
+                mb: 0, 
+                display: 'inline-block',
+                backgroundColor: '#2e2e2e', 
+                borderRadius: 2,
               }}
             >
-              Back to Home
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleBackClick}
+                sx={{
+                  backgroundColor: '#1DB954',
+                  '&:hover': {
+                    backgroundColor: '#1ed760',
+                    transform: 'translateY(-2px)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Back to Home
+              </Button>
+            </Paper>
           </Paper>
 
-          <Box sx={{ position: 'relative', minHeight: '300px' }}>
+          <Box sx={{ position: 'relative' }}>
             <Loading 
               isLoading={loading} 
               message="Searching for vibes..."
             />
             
+            {/* Year Filter Component */}
+            <YearFilter />
+            
+            {/* Search Results */}
             <Box sx={{ 
               opacity: loading ? 0.7 : 1,
               transition: 'opacity 0.3s ease'
             }}>
-              <SearchResults 
-                results={results || { 
-                  relevant_songs: [], 
-                  total_pages: 0, 
-                  total_results: 0, 
-                  query: query || "" 
-                }} 
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
+              <SearchResults />
             </Box>
           </Box>
         </Box>

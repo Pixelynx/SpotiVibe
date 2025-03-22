@@ -11,27 +11,32 @@ import {
   Pagination,
   Paper
 } from '@mui/material';
+import { extractYearFromDate } from '../../utils/dateUtils';
+import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
+import { 
+  selectFilteredVibeSongs, 
+  selectVibeQuery, 
+  selectVibeArtist,
+  selectVibeTotalItems, 
+  selectVibeTotalPages, 
+  selectVibeCurrentPage, 
+  selectIsFiltered 
+} from '../../store/selectors/vibeSearchSelectors.ts';
+import { changeVibeSearchPage } from '../../store/actions/vibeSearchActions.ts';
 
-interface Song {
-  title: string;
-  artist: string;
-  year?: string;
-  url?: string;
-}
-
-interface SearchResultsProps {
-  results: {
-    relevant_songs: Song[];
-    total_pages: number;
-    total_results: number;
-    query: string;
-  };
-  currentPage: number;
-  onPageChange: (page: number) => void;
-}
-
-const SearchResults: React.FC<SearchResultsProps> = ({ results, currentPage, onPageChange }) => {
-  if (!results || !results.relevant_songs || results.relevant_songs.length === 0) {
+const SearchResults: React.FC = () => {
+  const dispatch = useAppDispatch();
+  
+  // Redux hooks
+  const songs = useAppSelector(selectFilteredVibeSongs);
+  const query = useAppSelector(selectVibeQuery);
+  const artist = useAppSelector(selectVibeArtist);
+  const totalItems = useAppSelector(selectVibeTotalItems);
+  const totalPages = useAppSelector(selectVibeTotalPages);
+  const currentPage = useAppSelector(selectVibeCurrentPage);
+  const isFiltered = useAppSelector(selectIsFiltered);
+  
+  if (!songs || songs.length === 0) {
     return (
       <Paper 
         elevation={2} 
@@ -43,16 +48,16 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, currentPage, onP
         }}
       >
         <Typography variant="h6" color="text.secondary">
-          No songs found matching this vibe. Try a different search.
+          {isFiltered 
+            ? "No songs found matching this year filter. Try a different year." 
+            : "No songs found matching this vibe. Try a different search."}
         </Typography>
       </Paper>
     );
   }
 
-  const { relevant_songs, total_pages, total_results } = results;
-
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
-    onPageChange(page);
+    dispatch(changeVibeSearchPage({ page, query, artist }));
   };
 
   return (
@@ -62,12 +67,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, currentPage, onP
         align="center" 
         sx={{ mb: 4 }}
       >
-        Found {total_results} song{total_results !== 1 ? 's' : ''} matching your vibe.
+        {isFiltered 
+          ? `Showing ${songs.length} song${songs.length !== 1 ? 's' : ''} for the selected year.`
+          : `Found ${totalItems} song${totalItems !== 1 ? 's' : ''} matching your vibe.`}
       </Typography>
       
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {relevant_songs.map((song, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+        {songs.map((song, index) => (
+          <Grid item xs={12} sm={6} md={4} key={song.id || index}>
             <Card 
               sx={{ 
                 height: '100%', 
@@ -96,7 +103,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, currentPage, onP
                 </Typography>
                 {song.year && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Released: {song.year}
+                    Released: {extractYearFromDate(song.year)}
                   </Typography>
                 )}
               </CardContent>
@@ -129,10 +136,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, currentPage, onP
         ))}
       </Grid>
       
-      {total_pages > 1 && (
+      {!isFiltered && totalPages > 1 && (
         <Box display="flex" justifyContent="center" sx={{ mt: 4 }}>
           <Pagination 
-            count={total_pages} 
+            count={totalPages} 
             page={currentPage} 
             onChange={handlePageChange} 
             color="primary"

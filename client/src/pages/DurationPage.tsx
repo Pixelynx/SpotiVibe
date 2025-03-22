@@ -183,24 +183,24 @@ const DurationPage: React.FC = () => {
               <Typography variant="h6">
                 Total Time: {formattedDuration}
               </Typography>
+              
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleBackClick}
+                sx={{
+                  mt: 2,
+                  backgroundColor: '#1DB954',
+                  '&:hover': {
+                    backgroundColor: '#1ed760',
+                    transform: 'translateY(-2px)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Back to Home
+              </Button>
             </Paper>
-            
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleBackClick}
-              sx={{
-                mb: 3,
-                backgroundColor: '#1DB954',
-                '&:hover': {
-                  backgroundColor: '#1ed760',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Back to Home
-            </Button>
           </Paper>
 
           <Box sx={{ position: 'relative' }}>
