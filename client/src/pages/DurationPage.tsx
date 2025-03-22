@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -13,31 +13,45 @@ import {
   TableHead, 
   TableRow,
   ThemeProvider,
-  createTheme
+  createTheme,
+  Pagination
 } from '@mui/material';
 import Loading from '../components/common/Loading.tsx';
 import '../styles/DurationPage.css';
-import { API_BASE_URL } from '../config.ts';
-
-interface DurationData {
-  artist_name: string;
-  artists: string[];
-  song_table: string[][];
-  duration: {
-    hours: number;
-    minutes: number;
-    seconds: number;
-  };
-}
+import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
+import { 
+  selectArtists, 
+  selectSongs, 
+  selectDuration, 
+  selectLoadingStates, 
+  selectError, 
+  selectFormattedDuration, 
+  selectSelectedArtist, 
+  selectPaginatedSongs,
+  selectCurrentPage,
+  selectTotalPages
+} from '../store/selectors/catalogSelectors.ts';
+import { fetchArtists, selectArtistAndFetchSongs } from '../store/actions/catalogActions.ts';
+import { changePage } from '../store/slices/catalogSlice.ts';
 
 interface LocationState {
   artist: string;
 }
 
 const DurationPage: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<DurationData | null>(null);
+  // Redux hooks
+  const dispatch = useAppDispatch();
+  const artists = useAppSelector(selectArtists);
+  const songs = useAppSelector(selectSongs);
+  const paginatedSongs = useAppSelector(selectPaginatedSongs);
+  const duration = useAppSelector(selectDuration);
+  const formattedDuration = useAppSelector(selectFormattedDuration);
+  const loading = useAppSelector(selectLoadingStates);
+  const error = useAppSelector(selectError);
+  const selectedArtist = useAppSelector(selectSelectedArtist);
+  const currentPage = useAppSelector(selectCurrentPage);
+  const totalPages = useAppSelector(selectTotalPages);
+  
   const location = useLocation();
   const navigate = useNavigate();
   const { artist } = (location.state as LocationState) || {};
@@ -48,36 +62,42 @@ const DurationPage: React.FC = () => {
       return;
     }
 
-    const fetchDuration = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/catalog_duration`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ artist }),
-          credentials: 'include'
-        });
+    dispatch(fetchArtists());
+  }, [dispatch, artist, navigate]);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to get catalog information');
-        }
-
-        const result = await response.json();
-        setData(result);
-        setLoading(false);
-      } catch (err) {
-        setError((err as Error).message);
-        setLoading(false);
+  useEffect(() => {
+    if (artist && artists.length > 0) {
+      const foundArtist = artists.find(a => a.name.toLowerCase() === artist.toLowerCase());
+      if (foundArtist) {
+        dispatch(selectArtistAndFetchSongs(foundArtist.id));
       }
-    };
-
-    fetchDuration();
-  }, [artist, navigate]);
+    }
+  }, [artist, artists, dispatch]);
 
   const handleBackClick = () => {
     navigate('/');
+  };
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    dispatch(changePage(page));
+  };
+
+  const prepareSongTable = () => {
+    if (!paginatedSongs.length) return [];
+    
+    const columns = 5;
+    const rows = Math.ceil(paginatedSongs.length / columns);
+    
+    // Create a 2D array for the table
+    const table = Array(rows).fill(null).map(() => Array(columns).fill(''));
+    
+    paginatedSongs.forEach((song, index) => {
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      table[row][col] = `${song.name} (${song.duration})`;
+    });
+    
+    return table;
   };
 
   const theme = createTheme({
@@ -141,6 +161,10 @@ const DurationPage: React.FC = () => {
     );
   }
 
+  const songTable = prepareSongTable();
+  const artistColumns = artists.slice(0, 5).map(a => a.name);
+  const isLoading = loading.artists || loading.songs;
+
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="lg">
@@ -163,7 +187,7 @@ const DurationPage: React.FC = () => {
                 fontWeight: 'bold',
               }}
             >
-              Catalog Duration for {artist}
+              Catalog Duration for {selectedArtist?.name || artist}
             </Typography>
             
             <Paper 
@@ -177,7 +201,7 @@ const DurationPage: React.FC = () => {
               }}
             >
               <Typography variant="h6">
-                Total Time: {data ? `${data.duration.hours}h ${data.duration.minutes}m ${data.duration.seconds}s` : '0h 0m 0s'}
+                Total Time: {formattedDuration}
               </Typography>
             </Paper>
             
@@ -201,7 +225,7 @@ const DurationPage: React.FC = () => {
 
           <Box sx={{ position: 'relative', minHeight: '300px' }}>
             <Loading 
-              isLoading={loading} 
+              isLoading={isLoading} 
               message="Calculating song durations..."
             />
             
@@ -210,29 +234,52 @@ const DurationPage: React.FC = () => {
               sx={{ 
                 borderRadius: 2,
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                opacity: loading ? 0.7 : 1,
+                opacity: isLoading ? 0.7 : 1,
                 transition: 'opacity 0.3s ease',
               }}
             >
-              {data ? (
-                <Table sx={{ minWidth: 650 }}>
-                  <TableHead>
-                    <TableRow>
-                      {data.artists.map((artist, index) => (
-                        <TableCell key={index}>{artist}</TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {data.song_table.map((row, rowIndex) => (
-                      <TableRow key={rowIndex} hover>
-                        {row.map((song, colIndex) => (
-                          <TableCell key={colIndex}>{song}</TableCell>
+              {songs.length > 0 ? (
+                <>
+                  <Table sx={{ minWidth: 650 }}>
+                    <TableHead>
+                      <TableRow>
+                        {artistColumns.map((artist, index) => (
+                          <TableCell key={index}>{artist}</TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHead>
+                    <TableBody>
+                      {songTable.map((row, rowIndex) => (
+                        <TableRow key={rowIndex} hover>
+                          {row.map((song, colIndex) => (
+                            <TableCell key={colIndex}>{song}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                      <Pagination 
+                        count={totalPages} 
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary"
+                        size="large"
+                        sx={{
+                          '& .MuiPaginationItem-root': {
+                            color: '#fff',
+                          },
+                          '& .Mui-selected': {
+                            backgroundColor: '#1DB954',
+                          }
+                        }}
+                      />
+                    </Box>
+                  )}
+                </>
               ) : (
                 <Box sx={{ p: 4, textAlign: 'center' }}>
                   <Typography variant="body1" color="text.secondary">
