@@ -72,9 +72,8 @@ const Home: React.FC = () => {
     
     if (!vibeQuery || !vibeArtist) return;
     
-    navigate('/loading', { 
+    navigate('/vibe-search', { 
       state: { 
-        nextRoute: '/vibe-search',
         params: { query: vibeQuery, artist: vibeArtist } 
       } 
     });
