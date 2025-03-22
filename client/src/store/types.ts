@@ -39,8 +39,10 @@ export interface Image {
 export interface CatalogState {
   selectedArtist: string;
   searchedArtist: string;
+  originalArtist: string;
   artists: Artist[];
   songs: Song[];
+  allSongs: Song[];
   duration: {
     hours: number;
     minutes: number;

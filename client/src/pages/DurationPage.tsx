@@ -6,15 +6,15 @@ import {
   Typography, 
   Button, 
   Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Link,
+  Pagination,
   ThemeProvider,
   createTheme,
-  Pagination
+  Stack
 } from '@mui/material';
 import Loading from '../components/common/Loading.tsx';
 import '../styles/DurationPage.css';
@@ -29,9 +29,10 @@ import {
   selectSelectedArtist, 
   selectPaginatedSongs,
   selectCurrentPage,
-  selectTotalPages
+  selectTotalPages,
+  selectOriginalArtist
 } from '../store/selectors/catalogSelectors.ts';
-import { fetchArtists, selectArtistAndFetchSongs } from '../store/actions/catalogActions.ts';
+import { fetchArtistCatalogDuration, selectArtistAndFetchSongs } from '../store/actions/catalogActions.ts';
 import { changePage } from '../store/slices/catalogSlice.ts';
 
 interface LocationState {
@@ -51,6 +52,7 @@ const DurationPage: React.FC = () => {
   const selectedArtist = useAppSelector(selectSelectedArtist);
   const currentPage = useAppSelector(selectCurrentPage);
   const totalPages = useAppSelector(selectTotalPages);
+  const originalArtist = useAppSelector(selectOriginalArtist);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,42 +64,19 @@ const DurationPage: React.FC = () => {
       return;
     }
 
-    dispatch(fetchArtists());
+    dispatch(fetchArtistCatalogDuration(artist));
   }, [dispatch, artist, navigate]);
-
-  useEffect(() => {
-    if (artist && artists.length > 0) {
-      const foundArtist = artists.find(a => a.name.toLowerCase() === artist.toLowerCase());
-      if (foundArtist) {
-        dispatch(selectArtistAndFetchSongs(foundArtist.id));
-      }
-    }
-  }, [artist, artists, dispatch]);
-
-  const handleBackClick = () => {
-    navigate('/');
-  };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     dispatch(changePage(page));
   };
 
-  const prepareSongTable = () => {
-    if (!paginatedSongs.length) return [];
-    
-    const columns = 5;
-    const rows = Math.ceil(paginatedSongs.length / columns);
-    
-    // Create a 2D array for the table
-    const table = Array(rows).fill(null).map(() => Array(columns).fill(''));
-    
-    paginatedSongs.forEach((song, index) => {
-      const row = Math.floor(index / columns);
-      const col = index % columns;
-      table[row][col] = `${song.name} (${song.duration})`;
-    });
-    
-    return table;
+  const handleBackClick = () => {
+    navigate('/');
+  };
+
+  const handleArtistSelect = (artistId: string) => {
+    dispatch(selectArtistAndFetchSongs(artistId));
   };
 
   const theme = createTheme({
@@ -115,15 +94,18 @@ const DurationPage: React.FC = () => {
       },
     },
     components: {
-      MuiTableCell: {
+      MuiCard: {
         styleOverrides: {
           root: {
-            borderBottom: '1px solid #3a3a3a',
+            backgroundColor: '#282828',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           },
-          head: {
-            backgroundColor: '#1DB954',
-            color: '#ffffff',
-            fontWeight: 'bold',
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#282828',
           },
         },
       },
@@ -161,8 +143,6 @@ const DurationPage: React.FC = () => {
     );
   }
 
-  const songTable = prepareSongTable();
-  const artistColumns = artists.slice(0, 5).map(a => a.name);
   const isLoading = loading.artists || loading.songs;
 
   return (
@@ -187,7 +167,7 @@ const DurationPage: React.FC = () => {
                 fontWeight: 'bold',
               }}
             >
-              Catalog Duration for {selectedArtist?.name || artist}
+              Catalog Duration for {originalArtist || artist || (artists.length > 0 ? artists[0].name : '')}
             </Typography>
             
             <Paper 
@@ -223,45 +203,191 @@ const DurationPage: React.FC = () => {
             </Button>
           </Paper>
 
-          <Box sx={{ position: 'relative', minHeight: '300px' }}>
+          <Box sx={{ position: 'relative' }}>
             <Loading 
               isLoading={isLoading} 
               message="Calculating song durations..."
             />
             
-            <TableContainer 
-              component={Paper} 
-              sx={{ 
+            {/* CONTAINER 1: Artist Selector */}
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                mb: 3,
                 borderRadius: 2,
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                opacity: isLoading ? 0.7 : 1,
-                transition: 'opacity 0.3s ease',
               }}
             >
-              {songs.length > 0 ? (
-                <>
-                  <Table sx={{ minWidth: 650 }}>
-                    <TableHead>
-                      <TableRow>
-                        {artistColumns.map((artist, index) => (
-                          <TableCell key={index}>{artist}</TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {songTable.map((row, rowIndex) => (
-                        <TableRow key={rowIndex} hover>
-                          {row.map((song, colIndex) => (
-                            <TableCell key={colIndex}>{song}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2, 
+                  color: '#1DB954',
+                  fontWeight: 'medium',
+                }}
+              >
+                Select an Artist
+              </Typography>
+              
+              <Stack 
+                direction="row" 
+                spacing={1} 
+                sx={{ 
+                  flexWrap: 'wrap', 
+                  gap: 1,
+                  '& > *': {
+                    my: 0.5,
+                  }
+                }}
+              >
+                {/* Show the first artist (searched artist) in a slightly larger size */}
+                {artists.length > 0 && (
+                  <Paper
+                    key={artists[0].id}
+                    elevation={artists[0].isSelected ? 3 : 2}
+                    onClick={() => handleArtistSelect(artists[0].id)}
+                    sx={{
+                      px: 2.5,
+                      py: 1.75,
+                      cursor: 'pointer',
+                      backgroundColor: artists[0].isSelected ? 'rgba(29, 185, 84, 0.25)' : '#323232',
+                      color: artists[0].isSelected ? '#fff' : 'inherit',
+                      borderRadius: 2,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+                        backgroundColor: artists[0].isSelected ? 'rgba(29, 185, 84, 0.3)' : '#3a3a3a',
+                      },
+                      border: artists[0].isSelected ? '1px solid rgba(29, 185, 84, 0.6)' : 'none',
+                      fontWeight: 'medium',
+                    }}
+                  >
+                    <Typography variant="body1" fontWeight="medium">{artists[0].name}</Typography>
+                  </Paper>
+                )}
+                
+                {/* Show other artists in normal size */}
+                {artists.slice(1).map((artist) => (
+                  <Paper
+                    key={artist.id}
+                    elevation={artist.isSelected ? 2 : 1}
+                    onClick={() => handleArtistSelect(artist.id)}
+                    sx={{
+                      px: 2,
+                      py: 1.5,
+                      cursor: 'pointer',
+                      backgroundColor: artist.isSelected ? 'rgba(29, 185, 84, 0.2)' : '#323232',
+                      color: artist.isSelected ? '#fff' : 'inherit',
+                      borderRadius: 2,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                        backgroundColor: artist.isSelected ? 'rgba(29, 185, 84, 0.25)' : '#3a3a3a',
+                      },
+                      border: artist.isSelected ? '1px solid rgba(29, 185, 84, 0.5)' : 'none',
+                    }}
+                  >
+                    <Typography variant="body1">{artist.name}</Typography>
+                  </Paper>
+                ))}
+              </Stack>
+            </Paper>
+            
+            {/* CONTAINER 2: Song Grid */}
+            {/* TODO: Fix filter logic with artist selector */}
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                mb: 2,
+                minHeight: '300px',
+              }}
+            >
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2.5, 
+                  color: '#1DB954',
+                  fontWeight: 'medium',
+                }}
+              >
+                Song Collection
+              </Typography>
+              
+              {paginatedSongs.length > 0 ? (
+                <Box>
+                  <Grid container spacing={2}>
+                    {paginatedSongs.map((song) => (
+                      <Grid item xs={12} sm={6} md={4} lg={2.4} key={song.id}>
+                        <Card
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            '&:hover': {
+                              transform: 'translateY(-3px)',
+                              boxShadow: '0 8px 15px rgba(0, 0, 0, 0.3)',
+                            },
+                          }}
+                        >
+                          <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                            <Typography 
+                              variant="subtitle1" 
+                              component="h3" 
+                              sx={{ 
+                                fontWeight: 'medium',
+                                mb: 0.5,
+                                color: '#1DB954',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                              }}
+                            >
+                              {song.name}
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary"
+                              sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {song.artist}
+                            </Typography>
+                          </CardContent>
+                          <CardActions sx={{ p: 1.5, pt: 0, justifyContent: 'flex-end' }}>
+                            <Link
+                              href="#" // TODO: Populate from Genius API
+                              underline="hover"
+                              sx={{ 
+                                fontSize: '0.875rem',
+                                color: 'rgba(29, 185, 84, 0.8)',
+                                '&:hover': {
+                                  color: '#1DB954',
+                                }
+                              }}
+                            >
+                              Lyrics
+                            </Link>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                   
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                       <Pagination 
                         count={totalPages} 
                         page={currentPage}
@@ -279,15 +405,15 @@ const DurationPage: React.FC = () => {
                       />
                     </Box>
                   )}
-                </>
+                </Box>
               ) : (
                 <Box sx={{ p: 4, textAlign: 'center' }}>
                   <Typography variant="body1" color="text.secondary">
-                    Loading song information...
+                    No songs available for this artist.
                   </Typography>
                 </Box>
               )}
-            </TableContainer>
+            </Paper>
           </Box>
         </Box>
       </Container>

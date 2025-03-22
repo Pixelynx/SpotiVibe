@@ -4,8 +4,10 @@ import { CatalogState, Artist, Song } from '../types';
 const initialState: CatalogState = {
   selectedArtist: '',
   searchedArtist: '',
+  originalArtist: '',
   artists: [],
   songs: [],
+  allSongs: [],
   duration: {
     hours: 0,
     minutes: 0,
@@ -106,6 +108,14 @@ export const catalogSlice = createSlice({
       if (action.payload.currentPage) {
         state.pagination.currentPage = action.payload.currentPage;
       }
+    },
+    
+    setOriginalArtist: (state, action: PayloadAction<string>) => {
+      state.originalArtist = action.payload;
+    },
+    
+    setAllSongs: (state, action: PayloadAction<Song[]>) => {
+      state.allSongs = action.payload;
     }
   }
 });
@@ -120,7 +130,9 @@ export const {
   selectArtist,
   setSearchArtist,
   changePage,
-  setPagination
+  setPagination,
+  setOriginalArtist,
+  setAllSongs
 } = catalogSlice.actions;
 
 export default catalogSlice.reducer; 
