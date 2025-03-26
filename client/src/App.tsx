@@ -9,6 +9,7 @@ import VibeSearchPage from './pages/VibeSearchPage.tsx';
 import Loading from './components/common/Loading.tsx';
 import AuthContext, { AuthContextType } from './contexts/AuthContext.tsx';
 import { API_BASE_URL } from './config.ts';
+import './styles/App.css';
 
 const App: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(false);

@@ -159,7 +159,7 @@ const DurationPage: React.FC = () => {
             }}
           >
             <Typography 
-              variant="h4" 
+              variant="h2" 
               component="h1" 
               gutterBottom
               sx={{ 
