@@ -1,59 +1,93 @@
-# Spotify Vibe Search and Artist Music Time Calculator
+# SpotiVibe
 
-This application utilizes the Spotify API to search for songs based on a given "vibe" and calculate the total duration of an artist's officially released music on the platform. The project consists of two main components:
+A modern web application that combines the power of Spotify's music catalog with lyric analysis to help users discover songs based on specific vibes and calculate artist catalog durations.
 
-1.  Vibe Search: Users can input a word or phrase that represents a certain vibe, and the application searches for songs with similar vibes.
-2.  Artist Music Time Calculator: The app calculates and displays the total duration of an artist's music catalog on Spotify.
+## Overview
+
+SpotiVibe is a full-stack application that provides two main features:
+
+1. **Vibe Search**: An intelligent search system that finds songs matching a specific vibe or feeling by analyzing lyrics using natural language processing.
+2. **Catalog Duration Calculator**: Calculates the total duration of an artist's officially released music on Spotify.
 
 ### Demo v1:
-![SpotiVibe-v1-demo](https://github.com/user-attachments/assets/3864efe8-11b4-477a-8883-f988b48c4b49)
+![SpotiVibe-v1-demo](https://github.com/user-attachments/assets/
+3864efe8-11b4-477a-8883-f988b48c4b49)
+
+## Architecture
+
+The application follows a client-server architecture:
+
+- **Frontend**: Modern web interface built with HTML, CSS, and JavaScript
+- **Backend**: Python Flask server handling API requests and business logic
+- **External APIs**: Integration with Spotify and Genius APIs
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- Node.js 14+ (for client development)
+- Spotify Developer Account
+- Genius API Access
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/spotiVibe.git
+   cd spotiVibe
+   ```
+
+2. Set up the Python virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. Configure environment variables:
+   Create a `.env` file in the root directory with:
+   ```
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   GENIUS_ACCESS_TOKEN=your_genius_token
+   ```
+
+4. Start the server:
+   ```bash
+   python main.py
+   ```
+
+5. Access the application at `http://localhost:3000`
 
 ## Features
 
--   User authentication with Spotify
--   Search for artists and retrieve their tracks
--   Calculate total duration of an artist's music catalog
--   Search for songs based on a given "vibe" using lyrics analysis
--   Paginated display of search results
+- **User Authentication**: Secure Spotify OAuth integration
+- **Vibe Search**: Lyric analysis for finding songs matching specific vibes
+- **Artist Catalog**: Complete artist discography duration calculation
+- **Flexible Search**: Multiple search filters (vibe, artist, genre)
+- **Responsive Design**: Modern, mobile-friendly interface
 
-## Current Functionality
+## Project Structure
 
-1.  **User Authentication**: The application uses Spotify OAuth for user authentication.
-2.  **Artist Search**: Users can search for an artist, and the app retrieves the artist's tracks from Spotify.
-3.  **Music Time Calculation**: The app calculates the total duration of an artist's music catalog and displays it in hours, minutes, and seconds.
-4.  **Vibe Search**: Users can input a word or phrase, and the app searches for songs with lyrics that match the given vibe.
-5.  **Lyrics Analysis**: The app uses a zero-shot classification model to analyze lyrics and determine if they match the given vibe.
-6.  **Pagination**: Search results are paginated for better user experience.
+```
+spotiVibe/
+├── client/           # Frontend code
+├── server/           # Backend code
+├── templates/        # HTML templates
+├── assets/          # Static assets
+├── docs/            # Documentation
+└── tests/           # Test files
+```
 
-## Search Filters
+## Documentation
 
-The application supports more flexible search options for the Vibe Search feature:
+For detailed documentation, please refer to:
+- [Client Documentation](client/README.md)
+- [Server Documentation](server/README.md)
 
-- **Vibe Only**: Users can search for songs based solely on a vibe or phrase.
-- **Vibe and Artist**: Users can refine their search by specifying an artist along with the vibe.
-- **Vibe and Genre**: Users can further narrow down the search by selecting a genre in addition to the vibe.
-- **Vibe, Artist, and Genre**: Users can combine all three filters for a highly specific search.
+## Acknowledgments
 
-### Note:
-- The genre filter is currently in a preliminary stage and may require further refinement to ensure accurate filtering based on genre. This is an area identified for improvement and will be addressed in future updates.
-
-## Areas for Improvement
-
-1.  **Performance Optimization**: The app currently has issues with long request times, especially for artists with large discographies. This needs to be optimized, possibly by implementing caching or batch processing.
-
-2.  **Lyrics Analysis Accuracy**: The current method of analyzing lyrics is not effective at detecting intent or feeling. It primarily returns songs with similar words in the lyrics. This needs to be improved to better capture the essence of the "vibe" search.
-
-3.  **Error Handling**: While there is some error handling in place, it could be more robust and user-friendly. Implement more specific error messages and graceful error recovery.
-
-4.  **Rate Limiting**: Implement better rate limiting for API requests to avoid hitting rate limits, especially for the Genius API.
-
-5.  **Caching**: Implement caching for API responses to reduce the number of requests and improve performance.
-
-6.  **Asynchronous Processing**: Consider using asynchronous processing for time-consuming tasks like retrieving and analyzing lyrics.
-
-7.  **Code Organization**: The code could be better organized into separate modules for different functionalities (e.g., Spotify API handling, lyrics retrieval, analysis).
-
-8.  **Environment Variables**: Ensure all sensitive information (API keys, client IDs, etc.) are properly stored as environment variables.
-
-9. **Testing**: Implement unit tests and integration tests to ensure the reliability of the application.
-
+- Spotify Web API
+- Genius API
+- DeBERTa model for NLP analysis
