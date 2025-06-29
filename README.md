@@ -10,8 +10,7 @@ SpotiVibe is a full-stack application that provides two main features:
 2. **Catalog Duration Calculator**: Calculates the total duration of an artist's officially released music on Spotify.
 
 ### Demo v1:
-![SpotiVibe-v1-demo](https://github.com/user-attachments/assets/
-3864efe8-11b4-477a-8883-f988b48c4b49)
+![SpotiVibe-v1-demo](https://github.com/user-attachments/assets/3864efe8-11b4-477a-8883-f988b48c4b49)
 
 ## Architecture
 
