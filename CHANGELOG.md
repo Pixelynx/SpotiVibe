@@ -14,18 +14,30 @@
 - Feedback learning system for continuous improvement
 - Multi-modal analysis support combining lyrics and audio features
 - Comprehensive logging system for debugging and monitoring
+- Enhanced emotion detection with primary and secondary emotion classification
+- Sentiment polarity scoring (-1 to 1) for emotional tone analysis
+- Emotional intensity measurement for expression strength
+- Smart text chunking for processing songs of any length
 
 ### Changed
 - Enhanced lyrics analysis from basic zero-shot classification to multi-model approach
 - Improved vibe matching precision with combined audio and lyrical analysis
 - Restructured AI services with proper dependency injection
 - Updated core analysis pipeline with concurrent processing
+- Replaced binary relevance with nuanced emotion scoring
+- Enhanced result aggregation for long lyrics processing
+- Implemented weighted ensemble scoring across multiple models
+- Added context-aware analysis considering user queries
 
 ### Fixed
 - Improved analysis precision with multi-modal approach
 - Enhanced error handling with specific exception types
 - Better type safety with comprehensive type hints
 - Optimized performance with built-in caching
+- Resolved long lyrics truncation issues
+- Improved emotion detection accuracy with ensemble approach
+- Enhanced processing stability with proper error handling
+- Fixed context consideration in emotion matching
 
 ### [2023-03-25]
 

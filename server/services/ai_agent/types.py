@@ -1,13 +1,33 @@
 from dataclasses import dataclass
 from typing import Dict, Any, Optional, List, Union
 from datetime import datetime
+from enum import Enum
+
+class EmotionCategory(Enum):
+    """Supported emotion categories"""
+    HAPPINESS = "happiness"
+    SADNESS = "sadness"
+    ANGER = "anger"
+    FEAR = "fear"
+    SURPRISE = "surprise"
+    LOVE = "love"
+    ENERGY = "energy"
+
+@dataclass
+class EmotionScore:
+    """Individual emotion score"""
+    category: EmotionCategory
+    confidence: float
+    intensity: float
 
 @dataclass
 class EmotionResult:
-    """Result from emotion analysis"""
-    score: float
-    emotions: Dict[str, float]
-    confidence: float
+    """Comprehensive emotion analysis result"""
+    primary_emotion: EmotionScore
+    secondary_emotions: List[EmotionScore]
+    sentiment_polarity: float  # -1 to 1
+    emotional_intensity: float  # 0 to 1
+    score: float  # Final weighted score
     details: Dict[str, Any]
 
 @dataclass

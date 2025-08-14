@@ -124,7 +124,7 @@ FLASK_SECRET_KEY=your_secret_key
 
 4. Run development server:
    ```bash
-   python main.py
+   python app.py
    ```
 
 ## Testing Roadmap
