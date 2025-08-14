@@ -18,6 +18,11 @@
 - Sentiment polarity scoring (-1 to 1) for emotional tone analysis
 - Emotional intensity measurement for expression strength
 - Smart text chunking for processing songs of any length
+- Sophisticated audio feature analysis with mood prediction
+- Audio mood profiles for seven distinct emotional categories
+- Intelligent feature normalization for consistent audio scoring
+- Query-aware audio analysis with keyword boosting
+- Detailed feature contribution tracking for audio analysis
 
 ### Changed
 - Enhanced lyrics analysis from basic zero-shot classification to multi-model approach
