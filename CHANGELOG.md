@@ -5,6 +5,7 @@
 ### [2025-08-13]
 
 ### Added
+### [server]
 - Comprehensive AI Agent infrastructure for enhanced song-emotion matching
 - Type-safe data structures with Python dataclasses for AI analysis
 - Abstract base classes for modular AI model implementation
@@ -33,8 +34,17 @@
 - A/B testing framework for model evaluation
 - Comprehensive feature engineering pipeline
 - Model performance monitoring and metrics tracking
+- Multi-modal fusion strategies (weighted, learned, attention-based, rank)
+- Context-aware recommendation adjustments
+- Explainable recommendations with evidence
+- Real-time multi-modal processing
+- Time and activity-based context adaptation
+- Social context integration for recommendations
+
+### [client]
 
 ### Changed
+### [server]
 - Enhanced lyrics analysis from basic zero-shot classification to multi-model approach
 - Improved vibe matching precision with combined audio and lyrical analysis
 - Restructured AI services with proper dependency injection
@@ -45,6 +55,7 @@
 - Added context-aware analysis considering user queries
 
 ### Fixed
+### [server]
 - Improved analysis precision with multi-modal approach
 - Enhanced error handling with specific exception types
 - Better type safety with comprehensive type hints
