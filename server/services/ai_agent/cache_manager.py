@@ -7,7 +7,7 @@ import gzip
 import logging
 from typing import Any, Optional, Callable, Dict, TypeVar
 from datetime import datetime, timedelta
-import aioredis
+import aioredis  # type: ignore
 from .cache_config import CacheConfig, CacheKey
 from .exceptions import CacheError
 
